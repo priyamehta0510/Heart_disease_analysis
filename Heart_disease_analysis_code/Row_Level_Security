@@ -1,0 +1,49 @@
+----------------ROW LEVEL SECURITY----------------------
+
+
+
+-------step1-----------
+create or replace role white;
+create or replace role black;
+
+create or replace user shalini password = 'shalini34' default_Role = 'color';
+grant role black to user shalini;
+
+create or replace user priya password = 'priya23' default_Role = 'skintone';
+grant role white to user priya;
+
+grant role white to user ANKITADHOTRE;
+grant role black to user ANKITADHOTRE;
+
+select current_user();
+
+-----step2--------
+
+grant usage on warehouse sprintwarehouse to role black;
+grant usage on warehouse sprintwarehouse to role white; 
+
+grant usage on database sprint2 to role black;
+grant usage on database sprint2 to role white;
+
+grant usage on schema public to role white;
+grant usage on schema public to role black;
+
+create or replace secure view vw_health as
+select h.*
+from healthtable h
+where upper(h.Race) = upper(current_role());
+                   
+ select current_role();
+ 
+ grant select on view sprint2.public.vw_health to role black;
+ grant select on view sprint2.public.vw_health to role white;
+ 
+ use role black;
+ use database sprint2;
+ use schema public;
+ select * from vw_health;
+ 
+ use role white;
+ use database sprint2;
+ use schema public;
+ select * from vw_health;

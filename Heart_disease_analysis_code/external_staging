@@ -1,0 +1,25 @@
+----------- external staging------------ 
+
+
+
+create database sprint2;
+create or replace storage integration s3_int
+  type = external_stage
+  storage_provider = s3
+  enabled = true
+  storage_aws_role_arn = 'arn:aws:iam::456016997460:role/medicalrole'
+  storage_allowed_locations = ('s3://projecttbucket1/');
+  
+  DESC INTEGRATION s3_int;
+  
+   create or replace file format sprint2.public.my_csv_format
+type = csv field_delimiter = ',' skip_header = 1 null_if = ('NULL', 'null') empty_field_as_null = true;
+
+desc file format sprint2.public.my_csv_format;
+
+create or replace stage sprint2.public.sprint2_s3_stage
+  storage_integration = s3_int
+  url = 's3://projecttbucket1/'
+  file_format = my_csv_format;
+  
+  list @sprint2_s3_stage;

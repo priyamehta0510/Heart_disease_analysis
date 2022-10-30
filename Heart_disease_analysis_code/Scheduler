@@ -1,0 +1,21 @@
+-------------------------SCHEDULER(12AM EVERY FRIDAY)--------------------
+
+CREATE or replace TASK mytask_hour
+  WAREHOUSE = sprintwarehouse
+  SCHEDULE = 'USING CRON 00 00 * * 4 Asia/Kolkata'
+  TIMESTAMP_INPUT_FORMAT = 'YYYY-MM-DD HH24'
+  AS
+  copy into healthtable from @sprint2_s3_stage 
+  file_format = (type = csv field_optionally_enclosed_by = '"')
+  pattern = ".*heart_2020_cleaned1.csv";
+
+show tasks;
+
+alter task mytask_hour resume;  
+alter task mytask_hour suspend;
+
+select *
+  from table(information_schema.task_history())
+  order by scheduled_time;
+  
+  select * from healthtable;

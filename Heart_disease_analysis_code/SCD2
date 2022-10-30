@@ -1,0 +1,29 @@
+----------------------SCD2-----------------------
+
+
+create or replace  stream healthstream on table healthtable;
+
+select * from healthstream;
+select * from healthtable;
+
+create or replace  
+table target_t(HeartDisease string, BMI float, Smoking string, AlcoholDrinking string, Stroke string, PhysicalHealth number, MentalHealth number, DiffWalking string, Sex varchar, AgeCategory varchar, Race varchar, Diabetic varchar, PhysicalActivity string, GenHealth string, SleepTime string, Asthma string, KidneyDisease string, SkinCancer String, stream_type string default null, rec_version number default 0,REC_DATE TIMESTAMP_LTZ);
+
+update healthtable set HeartDisease = 'YES' where BMI = 38.35;
+delete from healthtable where BMI = 24.89;
+
+----------------- updating task----------------
+
+
+merge into target_t t
+using healthstream s 
+on t.SleepTime=s.SleepTime and (metadata$action='DELETE')
+when matched and metadata$isupdate='FALSE' then update set rec_version=9999, stream_type='DELETE'
+when matched and metadata$isupdate='TRUE' then update set rec_version=rec_version-1
+when not matched then insert  (HeartDisease, BMI, Smoking, AlcoholDrinking, Stroke, PhysicalHealth, MentalHealth, DiffWalking, Sex, AgeCategory, Race, Diabetic, PhysicalActivity, GenHealth, SleepTime, Asthma, KidneyDisease, SkinCancer,stream_type,rec_version,REC_DATE) values(s.HeartDisease, s.BMI, s.Smoking, s.AlcoholDrinking, s.Stroke, s.PhysicalHealth, s.MentalHealth, s.DiffWalking, s.Sex, s.AgeCategory, s.Race, s.Diabetic, s.PhysicalActivity,s.GenHealth, s.SleepTime, s.Asthma, s.KidneyDisease, s.SkinCancer,metadata$action, 0, CURRENT_TIMESTAMP() );
+
+show tasks;
+
+truncate table targett;get_
+
+select * from target_t;
